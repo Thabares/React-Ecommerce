@@ -130,7 +130,7 @@ const Footer = () => {
           <Room style={{ marginRight: '10px' }} /> 28, Vellore, India
         </ContactItem>
         <ContactItem>
-          <Phone style={{ marginRight: '10px' }} /> +91 890 326 6352
+          <Phone style={{ marginRight: '10px' }} /> +91 824 850 5245
         </ContactItem>
         <ContactItem>
           <MailOutline style={{ marginRight: '10px' }} />{' '}

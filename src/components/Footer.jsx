@@ -133,7 +133,8 @@ const Footer = () => {
           <Phone style={{ marginRight: '10px' }} /> +91 890 326 6352
         </ContactItem>
         <ContactItem>
-          <MailOutline style={{ marginRight: '10px' }} /> thabares786@gmail.com
+          <MailOutline style={{ marginRight: '10px' }} />{' '}
+          thabaresnazeer.1995@gmail.com
         </ContactItem>
         <Payment src="https://i.ibb.co/Qfvn4z6/payment.png" />
       </Right>

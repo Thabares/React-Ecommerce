@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Announcement from '../components/Announcement';
 import NewsLetter from '../components/Newsletter';
 import Footer from '../components/Footer';
@@ -6,6 +6,9 @@ import Navbar from '../components/Navbar';
 import { Add, Remove } from '@material-ui/icons';
 import { mobile } from '../responsive';
 import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { userRequest } from '../requestMethods';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const Container = styled.div``;
 
@@ -155,9 +158,119 @@ const SummaryButton = styled.button`
   cursor: pointer;
 `;
 
-const Cart = () => {
+const SlideIn = keyframes`
+from {bottom: -300px; opacity: 0}
+to {bottom: 50%; opacity: 1}
+`;
 
+const fadeIn = keyframes`
+from {opacity: 0} 
+to {opacity: 1}
+`
+
+const Modal = styled.div`
+display: ${props => props.paymentModal ? "block" : "none"};  /* Hidden by default */
+position: fixed; /* Stay in place */
+z-index: 1; /* Sit on top */
+left: 0;
+top: 0;
+width: 100%; /* Full width */
+height: 100%; /* Full height */
+overflow: auto; /* Enable scroll if needed */
+background-color: rgb(0,0,0); /* Fallback color */
+background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+-webkit-animation-name: ${fadeIn}; /* Fade in the background */
+-webkit-animation-duration: 0.4s;
+animation-name: ${fadeIn};
+animation-duration: 0.4s
+`
+const ModalContent = styled.div`
+position: fixed;
+bottom: 50%;
+background-color: #fefefe;
+width: 50%;
+left: 25%;
+-webkit-animation-name: ${SlideIn};
+-webkit-animation-duration: 0.4s;
+animation-name: ${SlideIn};
+animation-duration: 0.4s
+`
+const ModalHeader = styled.div`
+padding: 2px 16px;
+  background-color: #5cb85c;
+  color: #fff;
+`
+const CloseModal = styled.span`
+color: #fff;
+float: right;
+font-size: 28px;
+font-weight: bold;
+&:hover, &:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+`
+const ModalBody = styled.div`
+padding: 2px 16px;
+height: 5rem;
+display: flex;
+justify-content: space-around;
+align-items: center;
+.button
+`
+
+const PaymentButtons = styled.button`
+background-color: ${props => props.type === 'success' ? "#5cb85c" : "#ff2d2d"};
+border: none;
+font-size: 1rem;
+font-weight: 800;
+padding: 5px;
+cursor: pointer;
+color: #fff;
+`
+
+
+
+const Cart = () => {
   const cart = useSelector(state => state.cart)
+  const [paymentModal, setPaymentModal] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState("")
+  const history = useHistory()
+
+  const handlePayment = () => {
+    setPaymentModal(!paymentModal)
+  }
+
+  useEffect(() => {
+    const makeRequest = async () => {
+      try {
+        const res = await userRequest.post("/checkout/payment", {
+          amount: cart.total * 100,
+          paymentStatus,
+          orderDetails: {
+            name: "Lama Shop",
+            image: "https://avatars.githubusercontent.com/u/1486366?v=4",
+            billingAddress: "jtj",
+            shippingAddress: "jtj",
+            description: `Your total is $${cart.total}`,
+            amount: cart.total * 100
+          }
+        })
+
+        console.log("tab res",res)
+
+        if (paymentStatus === "success") {
+          history.push("/success", { paymentData: res.data, products: cart })
+        }
+      } catch (err) {
+
+      }
+    }
+    paymentStatus && makeRequest()
+  }, [paymentStatus, cart.total, history])
+
+
   return (
     <Container>
       <Navbar />
@@ -176,7 +289,7 @@ const Cart = () => {
         <Bottom>
           <Info>
             {cart.products.map(product => (
-              <Product>
+              <Product key={product._id}>
                 <ProductDetail>
                   <Image src={product.img} />
                   <Details>
@@ -229,11 +342,29 @@ const Cart = () => {
               <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
             </SummaryItem>
 
-            <SummaryButton>CHECKOUT NOW</SummaryButton>
+            <SummaryButton onClick={handlePayment}>CHECKOUT NOW</SummaryButton>
           </Summary>
         </Bottom>
       </Wrapper>
       <Footer />
+
+      <Modal id="myModal" paymentModal={paymentModal}>
+        <ModalContent >
+          <ModalHeader >
+            <CloseModal onClick={handlePayment}>&times;</CloseModal>
+            <h2>Payment Confirmation</h2>
+          </ModalHeader>
+          <ModalBody >
+            <PaymentButtons type={"success"} onClick={() =>
+              setPaymentStatus("success")
+            }>Success</PaymentButtons>
+            <PaymentButtons type={"failure"} onClick={() =>
+              setPaymentStatus("failure")
+            }>Failure</PaymentButtons>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
     </Container>
   );
 };

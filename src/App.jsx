@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser)
+  const quantity = useSelector(state => state.cart.quantity)
   return <Router>
     <Switch>
       <Route exact path="/">
@@ -27,7 +28,9 @@ const App = () => {
         <Product />
       </Route>
       <Route path="/cart">
-        <Cart />
+        {user && quantity > 0 ?
+          <Cart /> : <Redirect to="/" />
+        }
       </Route>
       <Route path="/success">
         <Success />
@@ -37,6 +40,9 @@ const App = () => {
       </Route>
       <Route path="/signup">
         {user ? <Redirect to="/" /> : <Register />}
+      </Route>
+      <Route path="/admin/login">
+        <Login />
       </Route>
     </Switch>
   </Router>

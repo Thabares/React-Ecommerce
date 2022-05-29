@@ -257,11 +257,10 @@ const Cart = () => {
             amount: cart.total * 100
           }
         })
-
-        console.log("tab res",res)
-
         if (paymentStatus === "success") {
           history.push("/success", { paymentData: res.data, products: cart })
+        } else {
+          history.push("/failure")
         }
       } catch (err) {
 
@@ -278,7 +277,9 @@ const Cart = () => {
       <Wrapper>
         <Title>YOUR BAG</Title>
         <Top>
-          <TopButton>CONTINUE SHOPPPING</TopButton>
+          <TopButton onClick={(event) => {
+            history.push("/")
+          }}>CONTINUE SHOPPPING</TopButton>
 
           <TopTexts>
             <TopText>Shopping Bag(2)</TopText>
@@ -329,14 +330,14 @@ const Cart = () => {
               <SummaryItemText>Subtotal</SummaryItemText>
               <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
             </SummaryItem>
-            <SummaryItem>
+            {/* <SummaryItem>
               <SummaryItemText>Estimated Shipping</SummaryItemText>
               <SummaryItemPrice>$ 5.90</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Shipping Discount</SummaryItemText>
               <SummaryItemPrice>$ -5.90</SummaryItemPrice>
-            </SummaryItem>
+            </SummaryItem> */}
             <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
